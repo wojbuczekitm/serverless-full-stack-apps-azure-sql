@@ -16,7 +16,7 @@ using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace ShowBusData
-{    
+{
     public static class ShowBusDataMain
     {
         private static HttpClient httpClient = new HttpClient();
@@ -24,23 +24,25 @@ namespace ShowBusData
 
         [FunctionName("ShowBusData")]
         public static async Task<IActionResult> ShowBusData([HttpTrigger("get", Route = "bus-data")] HttpRequest req, ILogger log)
-        {                              
-            int rid = 0, gid = 0;
+        {
+            int rid = 0;
+            int gid = 0;
 
             Int32.TryParse(req.Query["rid"], out rid);
             Int32.TryParse(req.Query["gid"], out gid);
-            
-            using(var conn = new SqlConnection(AZURE_CONN_STRING))
+
+            using (var conn = new SqlConnection(AZURE_CONN_STRING))
             {
                 var result = await conn.QuerySingleOrDefaultAsync<string>(
-                    "web.GetMonitoredBusData", 
-                    new {
+                    "web.GetMonitoredBusData",
+                    new
+                    {
                         @RouteId = rid,
                         @GeofenceId = gid
-                    }, commandType: CommandType.StoredProcedure);                
-                
+                    }, commandType: CommandType.StoredProcedure);
+
                 return new OkObjectResult(JObject.Parse(result));
-            }            
+            }
         }
     }
 }
